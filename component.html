@@ -4,9 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>vue组件</title>
+    <script src="./js/vue.js"></script>
 </head>
 <body>
-    
+    <ol id="app1">
+
+        <!-- 现在你可以用它构建另一个组件模板 -->
+        <todo-item></todo-item> 
+    </ol>
+
+
+    <script>
+
+        //在vue里，一个组件本质上是一个拥有预定义选项的vue实例。在vue中注册组件很简单：
+        Vue.component('todo-item',{
+            template: '<li>这是个待办事项</li>'
+        })
+
+
+    </script>
 </body>
 </html>
