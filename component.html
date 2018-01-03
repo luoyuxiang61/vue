@@ -11,7 +11,14 @@
     <ol id="app1">
 
         <!-- 现在你可以用它构建另一个组件模板 -->
-        <todo-item></todo-item> 
+        <!-- 父组件的data中的变量可以通过子组件的v-bind传给子组件vue实例的props属性中定义的变量prop，
+        子组件目标的数据来源就是props里的prop，所以子组件就有数据了 -->
+        <todo-item
+            v-for="item in groceryList"
+            v-bind:todo="item"
+            v-bind:key="item.id"
+        ></todo-item> 
+        <!-- 我们也需要为每个组件提供一个key，稍后再作详细解释 -->
     </ol>
 
 
@@ -19,8 +26,28 @@
 
         //在vue里，一个组件本质上是一个拥有预定义选项的vue实例。在vue中注册组件很简单：
         Vue.component('todo-item',{
-            template: '<li>这是个待办事项</li>'
+            //to-do-item现在接受一个prop，类似于一个自定义特性
+            //这个prop名为todo
+            //props必须放在template之前
+            props:['todo'],
+            template: '<li>{{todo.text}}</li>'
+
         })
+
+        var app1 = new Vue({
+            el: '#app1',
+            data: {
+                groceryList: [
+                    {id: 0, text: '蔬菜'},
+                    {id: 1, text: '奶酪'},
+                    {id: 2, text: '随便其他人吃什么东西'}
+                ]
+            }
+        })
+
+        //官方： 尽管这只是一个刻意设计的例子，但是我们已经设法将应用分割成了两个更小的单元。
+        //子单元通过 prop 接口与父单元进行了良好的解耦。我们现在可以进一步改进 <todo-item> 组件，
+        //提供更为复杂的模板和逻辑，而不会影响到父单元。
 
 
     </script>

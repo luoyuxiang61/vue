@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+</head>
+<body>
+          <!-- 计算属性 -->
+    <div id="example">
+        <p>Original message: "{{ message }}"</p>
+        <p>Computed reversed message: "{{ reversedMessage }}"</p>
+        <p>Reversed message "{{ reverseMessage() }}"</p>
+    </div>
+
+<!-- 侦听属性 -->
+<!--  -->
+    <div id="watch-example">
+        <p>
+            Ask a yes/no question:
+            <input v-model="question">
+        </p>
+        <p>{{ answer}}</p>
+    </div>
+
+        
+    <script>
+
+        //计算属性
+        var vm = new Vue({
+            el: '#example',
+            data: {
+                message: 'luo yuxiang'
+            },
+            computed: {
+                //计算属性的getter
+                //计算属性只有getter，不过在需要时你也可以提供一个setter
+                reversedMessage: function() {
+                    return this.message.split(' ').reverse().join(' ')
+                }
+            },
+            //我们可以将同一个函数定义为vm的一个方法而不是计算属性的getter。两种方式的最终结果是相同的。
+            //不同的是计算书型是基于它们的依赖进行缓存的，相比之下每当触发重新渲染时，调用方法总会再次执行
+            methods: {
+                reverseMessage: function() {
+                    return this.message.split(' ').reverse().join(' ')
+                }
+            }
+        })
+
+
+        //侦听属性
+        //虽然计算属性在大多数情况下更合适，但有时也需要一个自定义的侦听器。这就是为什么Vue通过watch
+        //选项提供了一个更通用的方法，来响应数据的变化。当需要在数据变化时执行异步或开销较大的操作时
+        //这个方式是最有用的
+        var vm1 = new Vue({
+            el: '#watch-example',
+            data: {
+                question: '',
+                answer: " i can't give you a answer until you ask a question"
+            },
+            watch: {
+                question: function(newQuestion) {
+                    this.answer = 'waiting for you to stop typing...'
+                    this.getAnswer()
+                }
+            },
+            methods: {
+                // `_.debounce` 是一个通过 Lodash 限制操作频率的函数。
+                // 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率
+                // AJAX 请求直到用户输入完毕才会发出。想要了解更多关于
+                // `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，
+                // 请参考：https://lodash.com/docs#debounce
+                getAnswer: _.debounce(
+                    function () {
+                        if(this.question.indexOf('?') === -1) {
+                            this.answer = 'Question usually contain a question mark. ;-)'
+                            return
+                        }
+
+                        this.answer = 'thinking...'
+
+                        var vmx = this
+                        axios.get('https://yesno.wtf/api')
+                            .then(function (response) {
+                                vmx.answer = _.capitalize(response.data.answer)
+                            })
+                            .catch(function(error) {
+                                vmx.answer = 'ERROR! Could not reach the API. ' + error
+                            })
+                    },1000 //这是我们判定用户停止输入等待的毫秒数
+
+                )
+            }
+
+        })
+
+
+        
+    </script>
+</body>
+</html>
